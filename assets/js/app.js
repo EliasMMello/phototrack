@@ -501,12 +501,12 @@
     }
     const logoY = Math.round(tarjaY + (tarjaHeight - logoH) / 2);
 
-    // 5. Fundo institucional semitransparente (Azul Institucional NOVACAP)
-    ctx.fillStyle = 'rgba(0, 32, 96, 0.90)';
+    // 5. Fundo do carimbo (Branco)
+    ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, tarjaY, safeW, tarjaHeight);
 
     // Linha de acento sutil no topo da tarja
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.28)';
+    ctx.fillStyle = 'rgba(0, 32, 96, 0.20)';
     const topBorderThickness = Math.max(2, Math.round(safeW * 0.0018));
     ctx.fillRect(0, tarjaY, safeW, topBorderThickness);
 
@@ -518,7 +518,7 @@
     // 7. Linha divisória vertical
     const dividerPadding = Math.round(tarjaHeight * 0.16);
     const dividerWidth = Math.max(1, Math.round(safeW * 0.0012));
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+    ctx.fillStyle = 'rgba(0, 32, 96, 0.25)';
     ctx.fillRect(
       dividerX,
       tarjaY + dividerPadding,
@@ -526,18 +526,21 @@
       tarjaHeight - (dividerPadding * 2)
     );
 
-    // 8. Renderização das 3 Linhas de Informações Completas
+    // 8. Renderização das 3 Linhas de Informações Completas (Letras azuis)
     const textStartY = Math.round(tarjaY + (tarjaHeight - totalTextBlockHeight) / 2 + fontSize);
 
-    ctx.font = `600 ${fontSize}px Arial, -apple-system, sans-serif`;
-    ctx.fillStyle = '#FFFFFF';
+    ctx.font = `700 ${fontSize}px Arial, -apple-system, sans-serif`;
+    ctx.fillStyle = '#002060';
 
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
-    ctx.shadowBlur = Math.max(2, Math.round(fontSize * 0.15));
-    ctx.shadowOffsetX = 1;
-    ctx.shadowOffsetY = 1;
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
 
     ctx.fillText(str1, textStartX, textStartY);
+
+    ctx.font = `600 ${fontSize}px Arial, -apple-system, sans-serif`;
+    ctx.fillStyle = '#003899';
     ctx.fillText(str2, textStartX, textStartY + lineHeight);
     ctx.fillText(str3, textStartX, textStartY + (lineHeight * 2));
 
@@ -628,6 +631,9 @@
 
       updateLoadingStatus('Aplicando estampa oficial NOVACAP...');
       renderWatermarkedCanvas(videoElem, width, height, line1, line2, line3);
+
+      // Desativa a câmera do dispositivo após registrar a foto e carimbar a localização
+      stopCamera();
 
       await displayGeneratedPreview(captureDate, line2);
 
@@ -763,6 +769,7 @@
     previewScreen.classList.add('hidden');
     previewImage.src = '';
     currentPhotoBlob = null;
+    startCamera(currentFacingMode);
   }
 
   function downloadCurrentPhoto() {
