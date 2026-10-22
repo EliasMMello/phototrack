@@ -1,4 +1,4 @@
-NOVACAP PhotoTrack - App de Fotos com Geolocalização (MVP)
+PhotoTrack - App de Fotos com Geolocalização (MVP)
 
 1. DESCRIÇÃO GERAL
 --------------------------------------------------------------------------------
@@ -7,7 +7,7 @@ dispositivos móveis e navegadores modernos.
 
 Permite capturar fotos em alta resolução ou selecionar imagens da galeria e 
 carimbar automaticamente no rodapé a estampa oficial com:
-- Logotipo oficial da NOVACAP posicionado à esquerda;
+- Logotipo posicionado à esquerda;
 - Tarja azul institucional semi-transparente;
 - Linha 1: [Logradouro], [Número] - [Bairro], [Cidade] - [UF], [CEP]
 - Linha 2: Lat: [Latitude com 6 casas decimais], Long: [Longitude com 6 casas decimais]
@@ -66,7 +66,7 @@ Opção C (Visual Studio Code):
 MÉTODO 1: GitHub Pages (Mais simples e 100% gratuito)
 1. Crie um repositório no seu GitHub e suba os arquivos do projeto.
 2. Vá em Settings > Pages > Source e escolha a branch principal ("main" ou "master").
-3. O GitHub fornecerá uma URL HTTPS segura (ex: https://seu-usuario.github.io/app-phototrack/).
+3. O GitHub fornecerá uma URL HTTPS segura (ex: https://seu-usuario.github.io/phototrack/).
 4. Abra esse link no navegador do celular (Chrome ou Safari) e permita a câmera e o GPS.
 
 MÉTODO 2: Ngrok ou LocalTunnel (Túnel HTTPS instantâneo para seu PC)
