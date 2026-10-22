@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#002060">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>PhotoTrack - Fotos com Geolocalização</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="icon" type="image/jpeg" href="assets/icon.jfif">
+  <link rel="apple-touch-icon" href="assets/icon.jfif">
+</head>
+<body>
+  <!-- Pré-carregamento do logotipo oficial da NOVACAP para o rodapé -->
+  <img id="logoPreload" src="assets/logotipo_novacap.png" alt="Logotipo NOVACAP" style="display: none;">
+
+  <!-- APLICAÇÃO PRINCIPAL: VIEWFINDER DA CÂMERA -->
+  <main id="appContainer" class="app-container">
+    
+    <!-- Barra Superior de Status -->
+    <header class="camera-header">
+      <div class="brand-badge">
+        <img src="assets/icon.jfif" alt="Ícone PhotoTrack" class="brand-icon">
+        <span class="brand-name">PhotoTrack</span>
+      </div>
+
+      <div id="gpsStatusBadge" class="status-badge status-searching" title="Status do GPS">
+        <span class="status-dot"></span>
+        <span id="gpsStatusText">Buscando GPS...</span>
+      </div>
+    </header>
+
+    <!-- Área de Visualização da Câmera (Viewfinder) -->
+    <div class="viewfinder-wrapper">
+      <video id="cameraVideo" autoplay playsinline muted></video>
+
+      <!-- Grade guia de enquadramento (Rule of Thirds) -->
+      <div class="viewfinder-grid" aria-hidden="true">
+        <div class="grid-line horizontal h1"></div>
+        <div class="grid-line horizontal h2"></div>
+        <div class="grid-line vertical v1"></div>
+        <div class="grid-line vertical v2"></div>
+        <div class="reticle-center"></div>
+      </div>
+
+      <!-- Alerta visual de permissão ou erro na câmera -->
+      <div id="cameraFallbackNotice" class="camera-notice hidden">
+        <div class="notice-icon">📷</div>
+        <h3 id="noticeTitle">Acesso à Câmera Necessário</h3>
+        <p id="noticeDesc">Permita o acesso à câmera no seu navegador ou selecione uma imagem da galeria.</p>
+        <button id="btnRetryCamera" class="btn-retry">Tentar Novamente</button>
+      </div>
+
+      <!-- Pré-visualização ao vivo do campo de informações (Estampa Oficial no Rodapé) -->
+      <div id="liveWatermarkBanner" class="live-watermark-banner" title="Pré-visualização do carimbo que será aplicado no rodapé">
+        <div class="live-banner-header">
+          <span class="live-banner-tag">Prévia do Carimbo no Rodapé</span>
+          <button id="btnToggleLiveBanner" class="btn-toggle-live" title="Minimizar/Expandir prévia da estampa">👁️</button>
+        </div>
+        <div class="live-watermark-content" id="liveWatermarkContent">
+          <div class="live-watermark-logo-col">
+            <img src="assets/logotipo_novacap.png" alt="NOVACAP" class="live-logo-img">
+          </div>
+          <div class="live-watermark-divider"></div>
+          <div class="live-watermark-text-col">
+            <div id="liveLineAddress" class="live-text-line live-address">Obtendo endereço...</div>
+            <div id="liveLineCoords" class="live-text-line live-coords">Lat: Aguardando GPS..., Long: ...</div>
+            <div id="liveLineDateTime" class="live-text-line live-datetime">Carregando data e hora...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flash visual no momento do clique -->
+      <div id="cameraFlash" class="camera-flash"></div>
+    </div>
+
+    <!-- Barra Inferior de Ações da Câmera -->
+    <footer class="camera-controls">
+      <!-- Botão para carregar foto da galeria (fallback e conveniência) -->
+      <label for="galleryInput" class="control-btn btn-secondary" title="Carregar foto da galeria" aria-label="Carregar foto da galeria">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z"/>
+        </svg>
+        <input type="file" id="galleryInput" accept="image/*" class="visually-hidden">
+      </label>
+
+      <!-- Botão Principal do Obturador (Captura) -->
+      <button id="btnCapture" class="btn-shutter" title="Capturar Foto com Estampa" aria-label="Tirar Foto">
+        <span class="shutter-inner"></span>
+      </button>
+
+      <!-- Botão para alternar entre câmera traseira e frontal -->
+      <button id="btnFlipCamera" class="control-btn btn-secondary" title="Alternar câmera" aria-label="Alternar câmera">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+          <path d="M20 4h-3.17L15 2H9L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm3.5-5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
+          <path d="M12 7V5l3 3-3 3V9a3 3 0 0 0-3 3H7a5 5 0 0 1 5-5z" opacity="0.3"/>
+        </svg>
+      </button>
+    </footer>
+  </main>
+
+  <!-- OVERLAY DE CARREGAMENTO / PROCESSAMENTO -->
+  <div id="loadingOverlay" class="loading-overlay hidden" aria-live="assertive">
+    <div class="loading-card">
+      <div class="spinner"></div>
+      <p id="loadingStatusText" class="loading-text">Processando imagem...</p>
+      <span class="loading-sub">Obtendo coordenadas e geocodificação</span>
+    </div>
+  </div>
+
+  <!-- TELA DE PRÉ-VISUALIZAÇÃO (PREVIEW) DA FOTO CARIMBADA -->
+  <section id="previewScreen" class="preview-screen hidden" aria-modal="true" role="dialog">
+    <header class="preview-header">
+      <button id="btnClosePreview" class="btn-header-action" title="Fechar visualização" aria-label="Fechar">
+        ✕
+      </button>
+      <div class="preview-title">
+        <span>Foto com Carimbo Oficial</span>
+        <small id="previewCoordsLabel">Lat: ..., Long: ...</small>
+      </div>
+      <div class="header-placeholder"></div>
+    </header>
+
+    <div class="preview-body">
+      <div class="preview-image-wrapper">
+        <img id="previewImage" alt="Prévia da foto carimbada pela NOVACAP">
+      </div>
+    </div>
+
+    <footer class="preview-controls">
+      <!-- Botão Tirar Outra Foto -->
+      <button id="btnRetake" class="btn-action btn-retake">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+        </svg>
+        <span>Tirar Outra</span>
+      </button>
+
+      <!-- Botão Compartilhar (Web Share API) -->
+      <button id="btnShare" class="btn-action btn-share hidden">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+        </svg>
+        <span>Compartilhar</span>
+      </button>
+
+      <!-- Botão Salvar Foto -->
+      <button id="btnSave" class="btn-action btn-save">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
+        </svg>
+        <span>Salvar Foto</span>
+      </button>
+    </footer>
+  </section>
+
+  <!-- Canvas Invisível para Renderização da Estampa em Resolução Original -->
+  <canvas id="captureCanvas" class="hidden-canvas" aria-hidden="true"></canvas>
+
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

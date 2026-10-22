@@ -1,0 +1,99 @@
+================================================================================
+📋 BRIEFING EXECUTIVO: MVP DO APP DE FOTOS COM GEOLOCALIZAÇÃO (NOVACAP)
+================================================================================
+
+1. OBJETIVO DO PROJETO
+--------------------------------------------------------------------------------
+Desenvolver um MVP de aplicação web client-side (HTML5, CSS3, JavaScript Vanilla) 
+para dispositivos móveis que permita capturar fotos e carimbar automaticamente 
+no rodapé da imagem a estampa oficial com o logotipo da NOVACAP, endereço completo 
+(via geocodificação reversa), coordenadas GPS e data/hora.
+
+Todo o processamento e salvamento da imagem será feito exclusivamente no navegador 
+do dispositivo do usuário, sem necessidade de backend ou envio de dados a 
+servidores externos.
+
+--------------------------------------------------------------------------------
+2. ESTRUTURA DE ARQUIVOS DA ENTREGA (MVP)
+--------------------------------------------------------------------------------
+O projeto deve ser entregue estritamente em 4 arquivos estáticos:
+
+1. index.html - Estrutura da interface do usuário (viewfinder da câmera, 
+   botões de ação e modal/tela de preview).
+2. style.css - Estilização responsiva para navegação em dispositivos móveis.
+3. app.js - Lógica de acesso à câmera, captura de GPS, consulta à API 
+   Nominatim, renderização do Canvas e salvamento do arquivo.
+4. README.txt - Instruções simples de como executar o projeto localmente ou 
+   disponibilizá-lo via HTTPS para testes móveis.
+
+--------------------------------------------------------------------------------
+3. ESPECIFICAÇÕES TÉCNICAS DA ESTAMPA (WATERMARK CANVAS)
+--------------------------------------------------------------------------------
+A) Identidade Visual (NOVACAP):
+   - Logotipo: Utilizar a marca da NOVACAP (símbolo curvo azul e tipografia 
+     "NOVACAP") posicionada à esquerda da tarja informativa no rodapé.
+   - Cor da Tarja: Fundo preto ou azul escuro institucional semitransparente 
+     (ex: rgba(0, 32, 96, 0.85) ou rgba(0, 0, 0, 0.8)) cobrindo 100% da largura 
+     no rodapé da imagem.
+   - Tipografia: Fonte sem serifa clara (ex: Arial, sans-serif), na cor branca 
+     (#FFFFFF), dimensionada proporcionalmente à resolução final da imagem.
+
+B) Formatação Obrigatória do Texto (Separado por Vírgula):
+   O texto ficará posicionado à direita do logotipo da NOVACAP na tarja do 
+   rodapé, dividido em 3 linhas:
+
+   - Linha 1 (Endereço Completo e CEP):
+     [Logradouro], [Número] - [Bairro], [Cidade] - [UF], [CEP]
+
+   - Linha 2 (Coordenadas GPS):
+     Lat: [Latitude com 6 casas decimais], Long: [Longitude com 6 casas decimais]
+
+   - Linha 3 (Data, Hora e Fuso Horário):
+     [Dia da Semana], [DD/MM/AAAA], [HH:MM:SS], GMT[X]
+
+--------------------------------------------------------------------------------
+4. FLUXO DE FUNCIONAMENTO DA APLICAÇÃO
+--------------------------------------------------------------------------------
+1. Acesso e Câmera (index.html + app.js):
+   - Solicitar acesso à câmera traseira em alta definição usando:
+     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+   - Solicitar acesso à geolocalização do dispositivo via:
+     navigator.geolocation.getCurrentPosition
+
+2. Captura da Foto & Extração de Dados:
+   - Ao clicar no botão de captura, o app obtém a imagem do vídeo da câmera, a 
+     latitude/longitude do GPS e a data/hora atual formatada em português (pt-BR).
+   - Faz uma requisição fetch para a API gratuita do OpenStreetMap (Nominatim):
+     https://nominatim.openstreetmap.org/reverse?format=json&lat={LAT}&lon={LNG}
+
+3. Geração da Imagem Final (HTML5 Canvas):
+   - Desenha a foto capturada no Canvas.
+   - Desenha a tarja no rodapé da foto de forma proporcional à resolução original.
+   - Insere o logo da NOVACAP no lado esquerdo da tarja.
+   - Renderiza as 3 linhas de texto com contorno ou contraste adequado.
+
+4. Tratamento do Modo Offline:
+   - Caso não haja conexão com a internet para consultar a API Nominatim, a 
+     Linha 1 renderizará: "Endereço: Indisponível (Sem Conexão)".
+   - As coordenadas e a data/hora continuam sendo gravadas normalmente.
+
+5. Preview e Salvamento:
+   - O usuário visualiza o resultado em tela cheia com a estampa aplicada.
+   - Botão "Tirar Outra": Descarta e volta para a câmera.
+   - Botão "Salvar Foto": Converte o Canvas em um arquivo de imagem (.jpg) e 
+     dispara o download direto para a galeria/pasta de arquivos do celular.
+
+--------------------------------------------------------------------------------
+5. REGRAS PRINCIPAIS PARA O AGENTE IA
+--------------------------------------------------------------------------------
+- Sem Frameworks ou Compiladores: Desenvolver em Vanilla JS puro, sem bibliotecas 
+  externas complexas (React, Vue, Vite, Webpack, etc.).
+- Responsividade e Escala: O cálculo das dimensões das fontes, tarja e logo no 
+  Canvas deve utilizar proporções baseadas na largura real em pixels da imagem 
+  capturada (ex: larguraImagem * 0.02 para tamanho da fonte), garantindo que a 
+  estampa fique legível em qualquer resolução.
+- Compatibilidade Móvel: O código deve estar pronto para rodar em servidores 
+  locais simples ou serviços de hospedagem estática gratuitos (ex: GitHub Pages) 
+  para testes diretos no celular sob HTTPS (necessário para liberar a câmera 
+  e o GPS no navegador).
+================================================================================

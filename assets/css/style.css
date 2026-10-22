@@ -1,0 +1,784 @@
+/* ==========================================================================
+   NOVACAP PhotoTrack - Estilos Mobile-First & Responsivos
+   Identidade: Azul Institucional NOVACAP (#002060), Branco (#FFFFFF)
+   ========================================================================== */
+
+:root {
+  --color-novacap: #002060;
+  --color-novacap-dark: #00143d;
+  --color-novacap-light: #003899;
+  --color-accent: #0077ff;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-bg-dark: #07090e;
+  --color-card-bg: rgba(13, 20, 36, 0.88);
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #94a3b8;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background-color: var(--color-bg-dark);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--color-text-primary);
+}
+
+/* ==========================================================================
+   ESTRUTURA PRINCIPAL (APP CONTAINER)
+   ========================================================================== */
+
+.app-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background-color: #000000;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   BARRA SUPERIOR (HEADER)
+   ========================================================================== */
+
+.camera-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 25;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: calc(12px + var(--safe-top)) 16px 14px 16px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.25) 75%, transparent 100%);
+  pointer-events: none;
+}
+
+.brand-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 32, 96, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 6px 14px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  pointer-events: auto;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.brand-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  object-fit: cover;
+  display: block;
+}
+
+.brand-name {
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+}
+
+/* Badge de Status do GPS */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+  pointer-events: auto;
+  transition: all 0.3s ease;
+  max-width: 58%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-badge.status-active .status-dot {
+  background-color: var(--color-success);
+  box-shadow: 0 0 8px var(--color-success);
+}
+
+.status-badge.status-searching .status-dot {
+  background-color: var(--color-warning);
+  box-shadow: 0 0 8px var(--color-warning);
+  animation: pulse-dot 1.4s infinite ease-in-out;
+}
+
+.status-badge.status-error .status-dot {
+  background-color: var(--color-danger);
+  box-shadow: 0 0 8px var(--color-danger);
+}
+
+@keyframes pulse-dot {
+  0% { transform: scale(0.85); opacity: 0.4; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.85); opacity: 0.4; }
+}
+
+/* ==========================================================================
+   ÁREA DO VIEWFINDER (CÂMERA E GRADE)
+   ========================================================================== */
+
+.viewfinder-wrapper {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000;
+}
+
+#cameraVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Grade de composição (Terços e Centro) */
+.viewfinder-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.grid-line {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+.grid-line.horizontal {
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+.grid-line.h1 { top: 33.33%; }
+.grid-line.h2 { top: 66.66%; }
+
+.grid-line.vertical {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+.grid-line.v1 { left: 33.33%; }
+.grid-line.v2 { left: 66.66%; }
+
+.reticle-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+}
+.reticle-center::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.7);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+}
+
+/* ==========================================================================
+   PRÉ-VISUALIZAÇÃO DA ESTAMPA AO VIVO (RODAPÉ DA TELA DE CAPTURA)
+   ========================================================================== */
+
+.live-watermark-banner {
+  position: absolute;
+  bottom: calc(108px + var(--safe-bottom));
+  left: 8px;
+  right: 8px;
+  z-index: 18;
+  background: rgba(0, 32, 96, 0.90);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  overflow: hidden;
+  transition: all 0.25s ease;
+  pointer-events: auto;
+}
+
+.live-banner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 3px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.live-banner-tag {
+  color: #38bdf8;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-toggle-live {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  opacity: 0.85;
+}
+
+.btn-toggle-live:active {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.live-watermark-banner.collapsed .live-watermark-content {
+  display: none;
+}
+
+.live-watermark-banner.collapsed {
+  opacity: 0.85;
+  background: rgba(0, 32, 96, 0.75);
+}
+
+.live-watermark-content {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px 10px 10px;
+  gap: 10px;
+}
+
+.live-watermark-logo-col {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.live-logo-img {
+  height: 38px;
+  width: auto;
+  max-width: 110px;
+  object-fit: contain;
+  display: block;
+}
+
+.live-watermark-divider {
+  width: 1px;
+  height: 38px;
+  background: rgba(255, 255, 255, 0.35);
+  flex-shrink: 0;
+}
+
+.live-watermark-text-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.live-text-line {
+  color: #ffffff;
+  font-family: Arial, -apple-system, sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  line-height: 1.25;
+}
+
+.live-address {
+  font-size: clamp(0.72rem, 2.5vw, 0.86rem);
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.live-coords {
+  font-size: clamp(0.66rem, 2.1vw, 0.78rem);
+  color: #e2e8f0;
+}
+
+.live-datetime {
+  font-size: clamp(0.66rem, 2.1vw, 0.78rem);
+  color: #cbd5e1;
+}
+
+/* Notificação / Fallback de Câmera */
+.camera-notice {
+  position: absolute;
+  inset: 20px;
+  margin: auto;
+  max-width: 360px;
+  height: max-content;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 18px;
+  padding: 24px 20px;
+  text-align: center;
+  z-index: 10;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+.camera-notice.hidden {
+  display: none;
+}
+
+.notice-icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+
+.camera-notice h3 {
+  font-size: 1.15rem;
+  margin-bottom: 8px;
+  color: #ffffff;
+}
+
+.camera-notice p {
+  font-size: 0.88rem;
+  color: #94a3b8;
+  line-height: 1.4;
+  margin-bottom: 18px;
+}
+
+.btn-retry {
+  background: var(--color-novacap);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 10px 22px;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-retry:active {
+  background: var(--color-novacap-light);
+}
+
+/* Efeito de Flash na Captura */
+.camera-flash {
+  position: absolute;
+  inset: 0;
+  background-color: #ffffff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 30;
+  transition: opacity 0.08s ease-out;
+}
+
+.camera-flash.active {
+  opacity: 0.85;
+  transition: none;
+}
+
+/* ==========================================================================
+   BARRA DE CONTROLES INFERIOR (CAPTURE & ACTIONS)
+   ========================================================================== */
+
+.camera-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 25;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 16px 24px calc(20px + var(--safe-bottom)) 24px;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.45) 75%, transparent 100%);
+}
+
+.control-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.control-btn:active {
+  transform: scale(0.92);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Botão do Obturador (Shutter) */
+.btn-shutter {
+  position: relative;
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: transparent;
+  border: 4px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.12s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.shutter-inner {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  transition: transform 0.12s ease, background-color 0.12s ease;
+}
+
+.btn-shutter:active {
+  transform: scale(0.94);
+}
+
+.btn-shutter:active .shutter-inner {
+  transform: scale(0.9);
+  background-color: #e2e8f0;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* ==========================================================================
+   OVERLAY DE CARREGAMENTO / PROCESSAMENTO
+   ========================================================================== */
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  transition: opacity 0.25s ease;
+}
+
+.loading-overlay.hidden {
+  display: none;
+  opacity: 0;
+}
+
+.loading-card {
+  background: var(--color-card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 300px;
+  width: 100%;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(255, 255, 255, 0.15);
+  border-top-color: #38bdf8;
+  border-right-color: var(--color-novacap);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin-bottom: 18px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 6px;
+}
+
+.loading-sub {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+/* ==========================================================================
+   TELA DE PREVIEW DA IMAGEM CARIMBADA
+   ========================================================================== */
+
+.preview-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background-color: #0b0f19;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.preview-screen.hidden {
+  display: none;
+}
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(10px + var(--safe-top)) 16px 12px 16px;
+  background-color: rgba(11, 15, 25, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 45;
+}
+
+.btn-header-action {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-header-action:active {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.preview-title {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.preview-title span {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.preview-title small {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  letter-spacing: 0.3px;
+}
+
+.header-placeholder {
+  width: 36px;
+}
+
+.preview-body {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  padding: 12px;
+  background: #000000;
+}
+
+.preview-image-wrapper {
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#previewImage {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+}
+
+.preview-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 16px calc(14px + var(--safe-bottom)) 16px;
+  background-color: rgba(11, 15, 25, 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 45;
+}
+
+.btn-action {
+  flex: 1;
+  max-width: 190px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.12s ease, opacity 0.15s ease;
+}
+
+.btn-action:active {
+  transform: scale(0.96);
+  opacity: 0.9;
+}
+
+/* Botão Tirar Outra (Descartar) */
+.btn-retake {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-retake:active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Botão Compartilhar */
+.btn-share {
+  background: rgba(0, 119, 255, 0.2);
+  color: #60a5fa;
+  border: 1px solid rgba(96, 165, 250, 0.4);
+}
+
+.btn-share.hidden {
+  display: none;
+}
+
+/* Botão Salvar Foto (Destaque Institucional) */
+.btn-save {
+  background: linear-gradient(135deg, var(--color-novacap) 0%, var(--color-novacap-light) 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 14px rgba(0, 32, 96, 0.5);
+}
+
+.btn-save:hover {
+  background: linear-gradient(135deg, var(--color-novacap-light) 0%, #004bbd 100%);
+}
+
+.hidden-canvas {
+  display: none;
+}
+
+/* ==========================================================================
+   AJUSTES PARA TELAS PEQUENAS E ORIENTAÇÕES
+   ========================================================================== */
+
+@media (max-width: 380px) {
+  .live-watermark-banner {
+    left: 4px;
+    right: 4px;
+    bottom: calc(98px + var(--safe-bottom));
+  }
+  
+  .live-logo-img {
+    height: 32px;
+    max-width: 90px;
+  }
+
+  .preview-controls {
+    gap: 8px;
+    padding: 10px 10px calc(12px + var(--safe-bottom)) 10px;
+  }
+  
+  .btn-action {
+    padding: 12px 10px;
+    font-size: 0.85rem;
+    gap: 6px;
+  }
+
+  .brand-badge {
+    padding: 4px 10px;
+  }
+  .brand-name {
+    font-size: 0.85rem;
+  }
+  .status-badge {
+    padding: 4px 10px;
+    font-size: 0.72rem;
+  }
+}
