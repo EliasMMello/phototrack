@@ -1,6 +1,6 @@
 # PhotoTrack - App de Fotos com Geolocalização (MVP)
 
-**1. DESCRIÇÃO GERAL
+**1. DESCRIÇÃO GERAL**
 --------------------------------------------------------------------------------
 Aplicação web client-side (HTML5, CSS3, JavaScript Vanilla puro) projetada para 
 dispositivos móveis e navegadores modernos. 
@@ -18,7 +18,7 @@ sem envio de fotos para servidores externos ou necessidade de backend.
 
 
 --------------------------------------------------------------------------------
-**2. ESTRUTURA DOS ARQUIVOS
+**2. ESTRUTURA DOS ARQUIVOS**
 --------------------------------------------------------------------------------
 ├── index.html              -> Estrutura HTML5 com viewfinder e preview
 ├── style.css               -> Estilos responsivos com tema mobile-first
@@ -30,7 +30,7 @@ sem envio de fotos para servidores externos ou necessidade de backend.
 
 
 --------------------------------------------------------------------------------
-**3. POR QUE É NECESSÁRIO HTTPS NO CELULAR?
+**3. POR QUE É NECESSÁRIO HTTPS NO CELULAR?**
 --------------------------------------------------------------------------------
 As APIs modernas de Câmera (navigator.mediaDevices.getUserMedia) e Geolocalização 
 (navigator.geolocation) são classificadas pelos navegadores (Chrome, Safari, 
@@ -40,7 +40,7 @@ Edge, Firefox) como "Powerful Features". Por regras internacionais de privacidad
 
 
 --------------------------------------------------------------------------------
-**4. COMO EXECUTAR LOCALMENTE NO COMPUTADOR (TESTES RÁPIDOS)
+**4. COMO EXECUTAR LOCALMENTE NO COMPUTADOR (TESTES RÁPIDOS)**
 --------------------------------------------------------------------------------
 Abra a pasta do projeto no terminal ou prompt de comando e use uma das opções:
 
@@ -60,7 +60,7 @@ Opção C (Visual Studio Code):
 
 
 --------------------------------------------------------------------------------
-**5. COMO TESTAR DIRETAMENTE NO CELULAR (COM HTTPS)
+**5. COMO TESTAR DIRETAMENTE NO CELULAR (COM HTTPS)**
 --------------------------------------------------------------------------------
 
 MÉTODO 1: GitHub Pages (Mais simples e 100% gratuito)
@@ -87,7 +87,7 @@ MÉTODO 3: Depuração Remota USB (Chrome DevTools)
 
 
 --------------------------------------------------------------------------------
-**6. FUNCIONAMENTO DO MODO OFFLINE E TRATAMENTO DE ERROS
+**6. FUNCIONAMENTO DO MODO OFFLINE E TRATAMENTO DE ERROS**
 --------------------------------------------------------------------------------
 - Sem Internet / Conexão fraca: Se a API Nominatim (OpenStreetMap) não responder, 
   a Linha 1 exibirá automaticamente: "Endereço: Indisponível (Sem Conexão)".
