@@ -436,9 +436,60 @@
   // RENDERIZAÇÃO DA ESTAMPA OFICIAL NO HTML5 CANVAS
   // ==========================================================================
 
+  function wrapText(ctx, text, maxWidth) {
+    if (!text) return [''];
+    const words = text.split(' ');
+    const lines = [];
+    let currentLine = '';
+
+    for (let i = 0; i < words.length; i++) {
+      const word = words[i];
+      const testLine = currentLine ? currentLine + ' ' + word : word;
+      if (ctx.measureText(testLine).width <= maxWidth) {
+        currentLine = testLine;
+      } else {
+        if (currentLine) {
+          lines.push(currentLine);
+          // Caso a palavra individual seja mais larga que maxWidth
+          if (ctx.measureText(word).width > maxWidth) {
+            let part = '';
+            for (let c = 0; c < word.length; c++) {
+              if (ctx.measureText(part + word[c]).width <= maxWidth) {
+                part += word[c];
+              } else {
+                lines.push(part);
+                part = word[c];
+              }
+            }
+            currentLine = part;
+          } else {
+            currentLine = word;
+          }
+        } else {
+          // Palavra única longa
+          let part = '';
+          for (let c = 0; c < word.length; c++) {
+            if (ctx.measureText(part + word[c]).width <= maxWidth) {
+              part += word[c];
+            } else {
+              lines.push(part);
+              part = word[c];
+            }
+          }
+          currentLine = part;
+        }
+      }
+    }
+    if (currentLine) {
+      lines.push(currentLine);
+    }
+    return lines.length > 0 ? lines : [''];
+  }
+
   function renderWatermarkedCanvas(sourceMedia, width, height, line1, line2, line3) {
-    const safeW = Math.max(width || 0, 800);
-    const safeH = Math.max(height || 0, 600);
+    // Mantém estritamente as dimensões originais da foto capturada ou carregada
+    const safeW = Math.max(Math.round(width || 0), 1);
+    const safeH = Math.max(Math.round(height || 0), 1);
 
     const canvas = captureCanvas;
     canvas.width = safeW;
@@ -448,7 +499,7 @@
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
-    // 1. Desenha a foto original capturada
+    // 1. Desenha a foto original capturada mantendo 100% suas proporções e dimensões nativas
     ctx.drawImage(sourceMedia, 0, 0, safeW, safeH);
 
     // 2. Parâmetros e posições preliminares
@@ -460,9 +511,9 @@
 
     const dividerX = logoMarginX + logoW + Math.round(safeW * 0.016);
     const textStartX = dividerX + Math.round(safeW * 0.016);
-    const maxTextWidth = safeW - textStartX - Math.round(safeW * 0.022);
+    const maxTextWidth = Math.max(safeW - textStartX - Math.round(safeW * 0.022), 60);
 
-    // 3. Redimensionamento Inteligente: Garante que TODAS as informações caibam sem cortes
+    // 3. Quebra de linha e ajuste de fonte
     const str1 = String(line1 || '');
     const str2 = String(line2 || '');
     const str3 = String(line3 || '');
@@ -470,29 +521,34 @@
     let fontSize = Math.max(12, Math.round(safeW * 0.019));
     ctx.font = `600 ${fontSize}px Arial, -apple-system, sans-serif`;
 
-    const w1 = ctx.measureText(str1).width;
-    const w2 = ctx.measureText(str2).width;
-    const w3 = ctx.measureText(str3).width;
-    const longestLineWidth = Math.max(w1, w2, w3);
+    let lines1 = wrapText(ctx, str1, maxTextWidth);
+    let lines2 = wrapText(ctx, str2, maxTextWidth);
+    let lines3 = wrapText(ctx, str3, maxTextWidth);
+    let totalLinesCount = lines1.length + lines2.length + lines3.length;
 
-    if (longestLineWidth > maxTextWidth && maxTextWidth > 50) {
-      const scaleFactor = (maxTextWidth / longestLineWidth) * 0.98;
-      fontSize = Math.max(10, Math.floor(fontSize * scaleFactor));
+    // Se o número de linhas ficar excessivo para a altura da foto, ajusta a escala da fonte
+    if (totalLinesCount > 4 && fontSize > 11) {
+      fontSize = Math.max(11, Math.round(fontSize * 0.88));
       ctx.font = `600 ${fontSize}px Arial, -apple-system, sans-serif`;
+      lines1 = wrapText(ctx, str1, maxTextWidth);
+      lines2 = wrapText(ctx, str2, maxTextWidth);
+      lines3 = wrapText(ctx, str3, maxTextWidth);
+      totalLinesCount = lines1.length + lines2.length + lines3.length;
     }
 
     const lineHeight = Math.round(fontSize * 1.34);
-    const totalTextBlockHeight = lineHeight * 2 + fontSize;
+    const totalTextBlockHeight = totalLinesCount * lineHeight;
 
-    // 4. Altura total da tarja proporcional
+    // 4. Altura total da tarja proporcional com espaço suficiente para as quebras de linha
+    const paddingY = Math.max(14, Math.round(safeH * 0.025));
     const minTarjaHeight = Math.max(
-      totalTextBlockHeight + Math.round(safeH * 0.045),
+      totalTextBlockHeight + (paddingY * 2),
       logoH + Math.round(safeH * 0.035),
       Math.round(safeH * 0.12),
       Math.round(safeW * 0.088),
-      140
+      Math.min(safeH * 0.45, 130)
     );
-    const tarjaHeight = Math.min(minTarjaHeight, Math.round(safeH * 0.26));
+    const tarjaHeight = Math.min(minTarjaHeight, Math.round(safeH * 0.45));
     const tarjaY = safeH - tarjaHeight;
 
     if (logoH > tarjaHeight * 0.75) {
@@ -516,7 +572,7 @@
     }
 
     // 7. Linha divisória vertical
-    const dividerPadding = Math.round(tarjaHeight * 0.16);
+    const dividerPadding = Math.round(tarjaHeight * 0.14);
     const dividerWidth = Math.max(1, Math.round(safeW * 0.0012));
     ctx.fillStyle = 'rgba(0, 32, 96, 0.25)';
     ctx.fillRect(
@@ -526,28 +582,35 @@
       tarjaHeight - (dividerPadding * 2)
     );
 
-    // 8. Renderização das 3 Linhas de Informações Completas (Letras azuis)
-    const textStartY = Math.round(tarjaY + (tarjaHeight - totalTextBlockHeight) / 2 + fontSize);
+    // 8. Renderização das Linhas de Informações com Quebra Automática
+    let currentY = Math.round(tarjaY + (tarjaHeight - totalTextBlockHeight) / 2 + fontSize);
 
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+
+    // Linha 1: Endereço (Negrito destaque)
     ctx.font = `700 ${fontSize}px Arial, -apple-system, sans-serif`;
     ctx.fillStyle = '#002060';
+    for (let i = 0; i < lines1.length; i++) {
+      ctx.fillText(lines1[i], textStartX, currentY);
+      currentY += lineHeight;
+    }
 
-    ctx.shadowColor = 'transparent';
-    ctx.shadowBlur = 0;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
-
-    ctx.fillText(str1, textStartX, textStartY);
-
+    // Linha 2: Coordenadas GPS
     ctx.font = `600 ${fontSize}px Arial, -apple-system, sans-serif`;
     ctx.fillStyle = '#003899';
-    ctx.fillText(str2, textStartX, textStartY + lineHeight);
-    ctx.fillText(str3, textStartX, textStartY + (lineHeight * 2));
+    for (let i = 0; i < lines2.length; i++) {
+      ctx.fillText(lines2[i], textStartX, currentY);
+      currentY += lineHeight;
+    }
 
-    ctx.shadowColor = 'transparent';
-    ctx.shadowBlur = 0;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
+    // Linha 3: Data e Hora
+    for (let i = 0; i < lines3.length; i++) {
+      ctx.fillText(lines3[i], textStartX, currentY);
+      currentY += lineHeight;
+    }
   }
 
   // ==========================================================================
@@ -694,8 +757,11 @@
       const line3 = formatLine3DateTime(captureDate);
 
       updateLoadingStatus('Aplicando estampa NOVACAP...');
-      const width = img.naturalWidth || img.width || 1920;
-      const height = img.naturalHeight || img.height || 1080;
+      const width = img.naturalWidth || img.width;
+      const height = img.naturalHeight || img.height;
+      if (!width || !height) {
+        throw new Error('Não foi possível identificar as dimensões da imagem.');
+      }
       renderWatermarkedCanvas(img, width, height, line1, line2, line3);
 
       await displayGeneratedPreview(captureDate, line2);
@@ -718,7 +784,7 @@
     const pad = (n) => String(n).padStart(2, '0');
     const ymd = `${dateObj.getFullYear()}${pad(dateObj.getMonth() + 1)}${pad(dateObj.getDate())}`;
     const hms = `${pad(dateObj.getHours())}${pad(dateObj.getMinutes())}${pad(dateObj.getSeconds())}`;
-    currentPhotoFileName = `NOVACAP_FOTO_${ymd}_${hms}.jpg`;
+    currentPhotoFileName = `PHOTOTRACK_${ymd}_${hms}.jpg`;
 
     let previewUrl = '';
     try {
@@ -790,7 +856,7 @@
 
     const link = document.createElement('a');
     link.href = downloadUrl;
-    link.download = currentPhotoFileName || 'NOVACAP_FOTO.jpg';
+    link.download = currentPhotoFileName || 'PHOTOTRACK_FOTO.jpg';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
